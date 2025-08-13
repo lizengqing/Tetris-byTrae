@@ -1,0 +1,562 @@
+/* 网页版俄罗斯方块游戏 - Game Boy风格样式 */
+
+/* CSS变量定义 */
+:root {
+  /* Game Boy颜色方案 */
+  --gameboy-screen-bg: #0f380f;
+  --gameboy-screen-fg: #9bbc0f;
+  --gameboy-body-bg: #e0e0e0;
+  --gameboy-button-bg: #8b956d;
+  --gameboy-button-active: #6b7555;
+  --gameboy-shadow: #c0c0c0;
+  --gameboy-highlight: #f0f0f0;
+  
+  /* 尺寸变量 */
+  --cell-size: 24px;
+  --gameboy-width: 400px;
+  --gameboy-height: 600px;
+  --screen-width: 240px;
+  --screen-height: 320px;
+  
+  /* 字体 */
+  --pixel-font: 'Press Start 2P', monospace;
+  --font-size-small: 8px;
+  --font-size-medium: 10px;
+  --font-size-large: 12px;
+}
+
+/* 全局重置和基础样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--pixel-font);
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-x: auto;
+}
+
+/* 掌机外壳容器 */
+.gameboy-container {
+  width: var(--gameboy-width);
+  max-width: 100%;
+  background: var(--gameboy-body-bg);
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px var(--gameboy-highlight),
+    inset 0 -2px 4px var(--gameboy-shadow);
+  position: relative;
+  padding: 20px;
+}
+
+/* 掌机顶部 */
+.gameboy-top {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.gameboy-brand {
+  font-size: var(--font-size-large);
+  color: var(--gameboy-button-bg);
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0 var(--gameboy-highlight);
+}
+
+/* 掌机主体 */
+.gameboy-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 屏幕容器 */
+.screen-container {
+  display: flex;
+  justify-content: center;
+}
+
+.screen-bezel {
+  background: var(--gameboy-button-bg);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.screen {
+  width: var(--screen-width);
+  height: var(--screen-height);
+  background: var(--gameboy-screen-bg);
+  border: 2px solid var(--gameboy-screen-fg);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 游戏画布 */
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* 游戏UI界面 */
+.game-ui {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 80px;
+  color: var(--gameboy-screen-fg);
+  font-size: var(--font-size-small);
+  z-index: 10;
+}
+
+.score-panel {
+  margin-bottom: 15px;
+}
+
+.score-item {
+  margin-bottom: 8px;
+}
+
+.score-item .label {
+  font-size: 6px;
+  margin-bottom: 2px;
+}
+
+.score-item .value {
+  font-size: var(--font-size-small);
+  text-align: right;
+}
+
+/* 下一个方块预览 */
+.next-panel {
+  margin-bottom: 15px;
+}
+
+.next-panel .label {
+  font-size: 6px;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.next-preview {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--gameboy-screen-fg);
+  margin: 0 auto;
+}
+
+#nextCanvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* 最高分面板 */
+.high-score-panel .label {
+  font-size: 6px;
+  margin-bottom: 2px;
+}
+
+.high-score-panel .value {
+  font-size: var(--font-size-small);
+  text-align: right;
+}
+
+/* 游戏覆盖层 */
+.game-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 56, 15, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+
+.overlay-content {
+  text-align: center;
+  color: var(--gameboy-screen-fg);
+}
+
+.game-title {
+  font-size: var(--font-size-large);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.game-subtitle {
+  font-size: var(--font-size-small);
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.start-message {
+  font-size: var(--font-size-medium);
+  margin-bottom: 20px;
+  animation: blink 1.5s infinite;
+}
+
+.controls-hint {
+  font-size: 6px;
+  line-height: 1.4;
+  opacity: 0.7;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+/* 控制区域 */
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+/* D-Pad控制器 */
+.dpad-container {
+  display: flex;
+  justify-content: center;
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 2px;
+  width: 80px;
+  height: 80px;
+}
+
+.dpad-btn {
+  background: var(--gameboy-button-bg);
+  border: none;
+  color: var(--gameboy-body-bg);
+  font-size: var(--font-size-medium);
+  font-family: var(--pixel-font);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.dpad-btn:active {
+  background: var(--gameboy-button-active);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px);
+}
+
+.dpad-up {
+  grid-column: 2;
+  grid-row: 1;
+  border-radius: 4px 4px 0 0;
+}
+
+.dpad-left {
+  grid-column: 1;
+  grid-row: 2;
+  border-radius: 4px 0 0 4px;
+}
+
+.dpad-center {
+  grid-column: 2;
+  grid-row: 2;
+  background: var(--gameboy-button-active);
+  cursor: default;
+}
+
+.dpad-right {
+  grid-column: 3;
+  grid-row: 2;
+  border-radius: 0 4px 4px 0;
+}
+
+.dpad-down {
+  grid-column: 2;
+  grid-row: 3;
+  border-radius: 0 0 4px 4px;
+}
+
+/* 功能按钮 */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 15px;
+}
+
+.action-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--gameboy-button-bg);
+  border: none;
+  color: var(--gameboy-body-bg);
+  font-family: var(--pixel-font);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.1s ease;
+  box-shadow: 
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.action-btn:active {
+  background: var(--gameboy-button-active);
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  transform: translateY(2px);
+}
+
+.btn-label {
+  font-size: var(--font-size-medium);
+  font-weight: bold;
+}
+
+.btn-desc {
+  font-size: 4px;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+/* 底部控制面板 */
+.bottom-panel {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.control-btn {
+  padding: 8px 16px;
+  background: var(--gameboy-button-bg);
+  border: none;
+  color: var(--gameboy-body-bg);
+  font-family: var(--pixel-font);
+  font-size: var(--font-size-small);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.control-btn:active {
+  background: var(--gameboy-button-active);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px);
+}
+
+/* 掌机底部 */
+.gameboy-bottom {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.speaker-grille {
+  display: flex;
+  gap: 4px;
+}
+
+.speaker-hole {
+  width: 8px;
+  height: 8px;
+  background: var(--gameboy-button-bg);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 触屏覆盖层 (移动端) */
+.touch-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+  :root {
+    --gameboy-width: 350px;
+    --screen-width: 200px;
+    --screen-height: 280px;
+  }
+  
+  body {
+    padding: 10px;
+  }
+  
+  .gameboy-container {
+    padding: 15px;
+  }
+  
+  .controls-container {
+    padding: 0 10px;
+  }
+  
+  .dpad {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .action-btn {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .button-row {
+    gap: 10px;
+  }
+  
+  /* 增大触摸区域 */
+  .dpad-btn,
+  .action-btn,
+  .control-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --gameboy-width: 320px;
+    --screen-width: 180px;
+    --screen-height: 240px;
+    --font-size-small: 7px;
+    --font-size-medium: 9px;
+    --font-size-large: 11px;
+  }
+  
+  .gameboy-container {
+    padding: 12px;
+  }
+  
+  .dpad {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .action-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* 横屏适配 */
+@media (orientation: landscape) and (max-height: 500px) {
+  body {
+    align-items: flex-start;
+    padding: 10px;
+  }
+  
+  .gameboy-container {
+    margin: 0 auto;
+  }
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  #gameCanvas,
+  #nextCanvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: pixelated;
+  }
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+  .start-message {
+    animation: none;
+  }
+  
+  .dpad-btn,
+  .action-btn,
+  .control-btn {
+    transition: none;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  body {
+    background: white;
+  }
+  
+  .gameboy-container {
+    box-shadow: none;
+    border: 2px solid #000;
+  }
+}
+
+/* 隐藏类 */
+.hidden {
+  display: none !important;
+}
+
+/* 游戏状态类 */
+.game-playing .game-overlay {
+  display: none;
+}
+
+.game-paused .game-overlay {
+  display: flex;
+}
+
+.game-over .start-message {
+  animation: none;
+  color: #ff6b6b;
+}
+
+/* 按钮激活状态 */
+.btn-pressed {
+  background: var(--gameboy-button-active) !important;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  transform: translateY(1px) !important;
+}
+
+/* 音效状态指示 */
+.sound-disabled #soundIcon {
+  opacity: 0.5;
+  text-decoration: line-through;
+}

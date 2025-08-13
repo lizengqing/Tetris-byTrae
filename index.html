@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>俄罗斯方块 - Game Boy风格</title>
+    
+    <!-- Google Fonts - Press Start 2P 像素字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23e0e0e0'/><rect x='2' y='2' width='12' height='8' fill='%230f380f'/><rect x='4' y='4' width='2' height='2' fill='%239bbc0f'/><rect x='6' y='4' width='2' height='2' fill='%239bbc0f'/><rect x='8' y='4' width='2' height='2' fill='%239bbc0f'/><rect x='10' y='4' width='2' height='2' fill='%239bbc0f'/></svg>">
+</head>
+<body>
+    <!-- 掌机外壳容器 -->
+    <div class="gameboy-container">
+        <!-- 掌机顶部 -->
+        <div class="gameboy-top">
+            <div class="gameboy-brand">TETRIS</div>
+        </div>
+        
+        <!-- 掌机主体 -->
+        <div class="gameboy-body">
+            <!-- 游戏屏幕区域 -->
+            <div class="screen-container">
+                <div class="screen-bezel">
+                    <div class="screen">
+                        <!-- 游戏画布 -->
+                        <canvas id="gameCanvas" width="240" height="480"></canvas>
+                        
+                        <!-- 游戏状态显示 -->
+                        <div class="game-ui">
+                            <div class="score-panel">
+                                <div class="score-item">
+                                    <div class="label">SCORE</div>
+                                    <div class="value" id="score">000000</div>
+                                </div>
+                                <div class="score-item">
+                                    <div class="label">LEVEL</div>
+                                    <div class="value" id="level">01</div>
+                                </div>
+                                <div class="score-item">
+                                    <div class="label">LINES</div>
+                                    <div class="value" id="lines">000</div>
+                                </div>
+                            </div>
+                            
+                            <!-- 下一个方块预览 -->
+                            <div class="next-panel">
+                                <div class="label">NEXT</div>
+                                <div class="next-preview">
+                                    <canvas id="nextCanvas" width="96" height="96"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- 最高分显示 -->
+                            <div class="high-score-panel">
+                                <div class="label">HIGH</div>
+                                <div class="value" id="highScore">000000</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 游戏开始/结束界面 -->
+                        <div class="game-overlay" id="gameOverlay">
+                            <div class="overlay-content">
+                                <div class="game-title">TETRIS</div>
+                                <div class="game-subtitle">Game Boy Style</div>
+                                <div class="start-message" id="startMessage">PRESS START</div>
+                                <div class="controls-hint">
+                                    <div>← → 移动</div>
+                                    <div>↑ 旋转</div>
+                                    <div>↓ 加速</div>
+                                    <div>SPACE 快落</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 控制区域 -->
+            <div class="controls-container">
+                <!-- 左侧D-Pad -->
+                <div class="dpad-container">
+                    <div class="dpad">
+                        <button class="dpad-btn dpad-up" id="btnUp" data-key="ArrowUp">▲</button>
+                        <button class="dpad-btn dpad-left" id="btnLeft" data-key="ArrowLeft">◄</button>
+                        <button class="dpad-btn dpad-center"></button>
+                        <button class="dpad-btn dpad-right" id="btnRight" data-key="ArrowRight">►</button>
+                        <button class="dpad-btn dpad-down" id="btnDown" data-key="ArrowDown">▼</button>
+                    </div>
+                </div>
+                
+                <!-- 右侧功能按钮 -->
+                <div class="action-buttons">
+                    <div class="button-row">
+                        <button class="action-btn" id="btnA" data-key="Space">
+                            <span class="btn-label">A</span>
+                            <span class="btn-desc">DROP</span>
+                        </button>
+                        <button class="action-btn" id="btnB" data-key="Escape">
+                            <span class="btn-label">B</span>
+                            <span class="btn-desc">PAUSE</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部控制面板 -->
+            <div class="bottom-panel">
+                <button class="control-btn" id="startBtn">START</button>
+                <button class="control-btn" id="selectBtn">SELECT</button>
+                <button class="control-btn" id="soundBtn">
+                    <span id="soundIcon">♪</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 掌机底部 -->
+        <div class="gameboy-bottom">
+            <div class="speaker-grille">
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 触屏手势检测区域 (移动端) -->
+    <div class="touch-overlay" id="touchOverlay"></div>
+    
+    <!-- JavaScript模块 -->
+    <script type="module" src="main.js"></script>
+</body>
+</html>
